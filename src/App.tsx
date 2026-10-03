@@ -5,7 +5,8 @@ import { calculateTKIAssessment } from './engine/tkiScoringEngine';
 import { submitTKIAssessmentData } from './utils/webhook';
 import { exportReportToPDF } from './utils/pdfExport';
 import { Header } from './components/Header';
-import { OnboardingModal } from './components/OnboardingModal';
+import { AuthGateModal } from './components/AuthGateModal';
+import { getStoredAuth, syncSurveyCompletion, UserAuth } from './utils/auth';
 import { ProgressBar } from './components/ProgressBar';
 import { TKIQuestionCard } from './components/TKIQuestionCard';
 import { TKIReport } from './components/TKIReport';
@@ -22,12 +23,23 @@ export const App: React.FC = () => {
   });
 
   const [userProfile, setUserProfile] = useState<UserProfile | null>(() => {
+    const auth = getStoredAuth();
+    if (auth) {
+      return {
+        fullName: auth.full_name,
+        email: auth.email,
+        organizationOrRole: auth.phone,
+        mode: 'cloud_sync'
+      };
+    }
     const saved = localStorage.getItem('tki_user_profile');
     return saved ? JSON.parse(saved) : null;
   });
 
-  const [isOnboardingOpen, setIsOnboardingOpen] = useState<boolean>(() => {
-    return !localStorage.getItem('tki_user_profile');
+  const [isAuthGateOpen, setIsAuthGateOpen] = useState<boolean>(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('token')) return true;
+    return !getStoredAuth();
   });
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
@@ -86,10 +98,16 @@ export const App: React.FC = () => {
     }
   }, [result]);
 
-  const handleStartOnboarding = (profile: UserProfile) => {
+  const handleAuthVerified = (auth: UserAuth) => {
+    const profile: UserProfile = {
+      fullName: auth.full_name,
+      email: auth.email,
+      organizationOrRole: auth.phone,
+      mode: 'cloud_sync',
+    };
     setUserProfile(profile);
     localStorage.setItem('tki_user_profile', JSON.stringify(profile));
-    setIsOnboardingOpen(false);
+    setIsAuthGateOpen(false);
   };
 
   const handleSelectOption = (questionId: number, option: 'A' | 'B') => {
@@ -133,6 +151,10 @@ export const App: React.FC = () => {
       setWebhookStatus('loading');
       const ok = await submitTKIAssessmentData(calculated);
       setWebhookStatus(ok ? 'success' : 'error');
+
+      if (profile.email) {
+        syncSurveyCompletion(profile.email, 'TKI', `Phong cách chủ đạo: ${calculated.dominantMode}`);
+      }
     } else {
       setWebhookStatus('idle');
     }
@@ -281,10 +303,10 @@ export const App: React.FC = () => {
         {result && <PDFExportView result={result} />}
       </div>
 
-      {/* Onboarding Dialog */}
-      <OnboardingModal
-        isOpen={isOnboardingOpen && currentView === 'survey'}
-        onStart={handleStartOnboarding}
+      {/* Auth Gate Dialog */}
+      <AuthGateModal
+        isOpen={isAuthGateOpen && currentView === 'survey'}
+        onVerified={handleAuthVerified}
       />
 
       {/* Footer */}
