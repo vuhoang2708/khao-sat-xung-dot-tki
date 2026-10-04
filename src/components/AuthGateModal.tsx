@@ -244,7 +244,7 @@ export const AuthGateModal: React.FC<AuthGateModalProps> = ({ isOpen, onVerified
               </div>
               <div className="p-3 bg-slate-800/60 border border-slate-700/60 rounded-lg text-xs text-slate-300 max-w-sm mx-auto text-left space-y-1">
                 <p>&bull; Mở email và bấm nút <strong className="text-amber-400">"BẮT ĐẦU LÀM BÀI KHẢO SÁT NGAY"</strong>.</p>
-                <p>&bull; Liên kết có hiệu lực trong 30 phút và chỉ sử dụng 1 lần.</p>
+                <p>&bull; Liên kết có hiệu lực trong 1 giờ và chỉ sử dụng 1 lần.</p>
               </div>
               <div>
                 <button
