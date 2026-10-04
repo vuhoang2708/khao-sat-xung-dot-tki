@@ -1,5 +1,5 @@
 /**
- * Module quản lý định danh & xác thực Cổng 1-Chạm (Auth Gate)
+ * Module quản lý định danh & xác thực Cổng Định Danh (Auth Gate)
  * Khảo sát Xử lý Xung đột (Thomas-Kilmann - TKI) - DHM
  */
 

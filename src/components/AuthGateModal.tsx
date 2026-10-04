@@ -133,7 +133,7 @@ export const AuthGateModal: React.FC<AuthGateModalProps> = ({ isOpen, onVerified
               <span>Delivering Happiness &bull; Cổng Định Danh</span>
             </div>
             <h2 className="text-2xl font-bold text-white tracking-tight">
-              Xác Thực Học Viên 1-Chạm
+              Xác Thực Học Viên
             </h2>
             <p className="text-xs sm:text-sm text-slate-400">
               Nhập thông tin để mở khóa bài Khảo sát Ứng xử Xung đột (Thomas-Kilmann - TKI) và đồng bộ kết quả.
@@ -238,7 +238,7 @@ export const AuthGateModal: React.FC<AuthGateModalProps> = ({ isOpen, onVerified
               <div className="space-y-1">
                 <h3 className="text-lg font-bold text-white">Kiểm Tra Hộp Thư Của Bạn!</h3>
                 <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                  Liên kết kích hoạt 1-chạm đã được gửi tới:<br />
+                  Liên kết kích hoạt đã được gửi tới:<br />
                   <span className="font-semibold text-amber-400">{email}</span>
                 </p>
               </div>
