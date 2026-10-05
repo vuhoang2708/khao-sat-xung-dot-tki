@@ -21,6 +21,20 @@
     "role": "Coach"
   },
   {
+    "name": "Vũ Hoàng (Test)",
+    "email": "vuhoang2708software@gmail.com",
+    "phone": "0900001234",
+    "cohort": "BTC / Coach",
+    "role": "Coach"
+  },
+  {
+    "name": "Culture Code (Test)",
+    "email": "culturecodeproject@gmail.com",
+    "phone": "0900001234",
+    "cohort": "BTC / Coach",
+    "role": "Coach"
+  },
+  {
     "name": "Anh Hưng",
     "email": "hung.coach@dhm.vn",
     "phone": "",
