@@ -289,17 +289,20 @@ export async function syncSurveyCompletion(email: string, surveyType: string, re
   };
 
   try {
-    if (navigator.sendBeacon) {
-      navigator.sendBeacon(AUTH_GATE_WEBHOOK_URL, JSON.stringify(payload));
-      return true;
-    }
-    await fetch(AUTH_GATE_WEBHOOK_URL, {
+    const resp = await fetch(AUTH_GATE_WEBHOOK_URL, {
       method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload),
+      redirect: 'follow'
     });
-    return true;
+    const text = await resp.text();
+    let data: any = null;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = null;
+    }
+    return Boolean(data && data.success);
   } catch (err) {
     console.warn('Sync completion error:', err);
     return false;
