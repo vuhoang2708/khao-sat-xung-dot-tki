@@ -83,20 +83,11 @@ export const AuthGateModal: React.FC<AuthGateModalProps> = ({ isOpen, onVerified
       return;
     }
 
-    // Case B: Chuyển trực tiếp từ LMS (?email=...&source=lms)
-    if (emailParam && sourceParam === 'lms') {
-      const auth = saveStoredAuth({
-        email: emailParam.toLowerCase().trim(),
-        full_name: params.get('name') || emailParam,
-        phone: params.get('phone') || '',
-        status: 'verified',
-        first_touch_survey: 'TKI'
-      });
-      setVerifiedName(auth.full_name || auth.email);
-      setUiState('success');
-      setTimeout(() => {
-        onVerified(auth);
-      }, 800);
+    // Case B (?email=...&source=lms) bypass đã được gỡ bỏ vì lý do an toàn.
+    // Tự động điền email vào ô nhận diện Roster để học viên không phải gõ lại,
+    // nhưng học viên vẫn bắt buộc phải bấm xác thực và đối soát qua Roster/mã xác thực.
+    if (emailParam) {
+      setIdentifier(emailParam.trim());
     }
   }, [onVerified]);
 

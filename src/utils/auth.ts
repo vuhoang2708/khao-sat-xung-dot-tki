@@ -59,8 +59,7 @@ export async function loadAuthorizedRoster(): Promise<RosterLearner[]> {
     return authorizedRosterCache;
   }
   const sources = [
-    '/data/authorized_roster.json',
-    'https://delivering-happiness.vercel.app/lms/authorized_roster.json'
+    '/data/authorized_roster.json'
   ];
 
   for (const src of sources) {
@@ -153,30 +152,12 @@ export function findLearnerInRoster(rawInput: string, roster?: RosterLearner[]):
 }
 
 /**
- * Đọc phiên đăng nhập (Hỗ trợ 3 tầng: URL params -> LMS Session -> Local Session)
+ * Đọc phiên đăng nhập (Hỗ trợ 2 tầng: LMS Session -> Local Session)
+ * Đã gỡ bỏ URL query bypass (?email=...&source=lms) không xác thực
  */
 export function getStoredAuth(): UserAuth | null {
   try {
-    // Tầng 1: Kiểm tra URL Query Params (?email=...&source=lms)
-    if (typeof window !== 'undefined' && window.location) {
-      const params = new URLSearchParams(window.location.search);
-      const emailParam = params.get('email');
-      const sourceParam = params.get('source');
-      if (emailParam && sourceParam === 'lms') {
-        const emailClean = emailParam.toLowerCase().trim();
-        const profile: Partial<UserAuth> = {
-          email: emailClean,
-          full_name: params.get('name') || emailClean,
-          phone: params.get('phone') || '',
-          cohort: params.get('cohort') || 'Học viên',
-          status: 'verified',
-          first_touch_survey: 'TKI'
-        };
-        return saveStoredAuth(profile);
-      }
-    }
-
-    // Tầng 2: Kiểm tra phiên LMS Session (dhm_lms_auth_user)
+    // Tầng 1: Kiểm tra phiên LMS Session (dhm_lms_auth_user)
     const lmsRaw = localStorage.getItem(LMS_AUTH_KEY);
     if (lmsRaw) {
       try {
@@ -286,16 +267,12 @@ export async function verifyMagicLink(token: string, email?: string): Promise<Ve
     const data = await response.json();
     return data;
   } catch (err) {
-    console.warn('Webhook verify error, using fallback:', err);
+    console.error('Webhook verify error, fail-closed:', err);
     return {
-      success: true,
-      verified: true,
-      user: {
-        full_name: 'Học viên DHM',
-        phone: '',
-        email: email || '',
-        status: 'verified'
-      }
+      success: false,
+      verified: false,
+      error: 'NETWORK_ERROR',
+      message: 'Không thể kết nối đến máy chủ xác thực. Vui lòng kiểm tra kết nối mạng và thử lại.'
     };
   }
 }

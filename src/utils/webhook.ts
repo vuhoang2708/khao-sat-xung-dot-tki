@@ -1,6 +1,6 @@
 import { TKIAssessmentResult } from '../types/tki';
 
-export const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbz_tki_placeholder/exec';
+export const WEBHOOK_URL = ((import.meta as any).env?.VITE_WEBHOOK_URL as string) || 'https://script.google.com/macros/s/AKfycbz_tki_placeholder/exec';
 
 export async function submitTKIAssessmentData(result: TKIAssessmentResult): Promise<boolean> {
   const payload = {
