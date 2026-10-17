@@ -111,6 +111,10 @@ export const App: React.FC = () => {
   };
 
   const handleSelectOption = (questionId: number, option: 'A' | 'B') => {
+    if (!getStoredAuth()) {
+      setIsAuthGateOpen(true);
+      return;
+    }
     const nextAnswers = { ...answersMap, [questionId]: option };
     setAnswersMap(nextAnswers);
 
@@ -135,6 +139,10 @@ export const App: React.FC = () => {
   };
 
   const handleSubmit = async () => {
+    if (!getStoredAuth()) {
+      setIsAuthGateOpen(true);
+      return;
+    }
     const profile: UserProfile = userProfile || {
       fullName: 'Khách Ẩn Danh',
       email: '',
@@ -226,6 +234,7 @@ export const App: React.FC = () => {
         mode={currentMode}
         currentView={currentView}
         onNavigateView={handleNavigateView}
+        onOpenAuth={() => setIsAuthGateOpen(true)}
       />
 
       {/* Main Container */}
@@ -305,8 +314,9 @@ export const App: React.FC = () => {
 
       {/* Auth Gate Dialog */}
       <AuthGateModal
-        isOpen={isAuthGateOpen && currentView === 'survey'}
+        isOpen={isAuthGateOpen}
         onVerified={handleAuthVerified}
+        onClose={() => setIsAuthGateOpen(false)}
       />
 
       {/* Footer */}

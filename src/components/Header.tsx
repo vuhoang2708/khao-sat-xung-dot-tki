@@ -11,6 +11,7 @@ interface HeaderProps {
   mode: AssessmentMode;
   currentView: 'survey' | 'research' | 'roadmap';
   onNavigateView: (view: 'survey' | 'research' | 'roadmap') => void;
+  onOpenAuth?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -22,6 +23,7 @@ export const Header: React.FC<HeaderProps> = ({
   mode,
   currentView,
   onNavigateView,
+  onOpenAuth,
 }) => {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-xl">
@@ -90,7 +92,18 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* User Info & Actions */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {userName && (
+          {(!userName || userName === 'Khách Ẩn Danh') && onOpenAuth && (
+            <button
+              onClick={onOpenAuth}
+              className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 hover:brightness-110 active:scale-95 text-slate-950 text-xs font-bold transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
+              title="Đăng nhập tài khoản học viên"
+            >
+              <span>🔑</span>
+              <span>Đăng Nhập</span>
+            </button>
+          )}
+
+          {userName && userName !== 'Khách Ẩn Danh' && (
             <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-xs">
               <User className="w-3.5 h-3.5 text-indigo-400" />
               <span className="font-medium text-slate-200 max-w-[100px] sm:max-w-[140px] truncate">

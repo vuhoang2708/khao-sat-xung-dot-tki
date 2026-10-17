@@ -8,14 +8,15 @@ import {
   loadAuthorizedRoster,
   findLearnerInRoster
 } from '../utils/auth';
-import { Sparkles, Mail, User, Phone, CheckCircle2, AlertCircle, Loader2, ArrowLeft, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Sparkles, Mail, User, Phone, CheckCircle2, AlertCircle, Loader2, ArrowLeft, ArrowRight, ShieldCheck, X } from 'lucide-react';
 
 interface AuthGateModalProps {
   isOpen: boolean;
   onVerified: (auth: UserAuth) => void;
+  onClose?: () => void;
 }
 
-export const AuthGateModal: React.FC<AuthGateModalProps> = ({ isOpen, onVerified }) => {
+export const AuthGateModal: React.FC<AuthGateModalProps> = ({ isOpen, onVerified, onClose }) => {
   const [uiState, setUiState] = useState<'roster' | 'trial' | 'waiting' | 'verifying' | 'success'>('roster');
   
   // Roster Stage
@@ -101,6 +102,17 @@ export const AuthGateModal: React.FC<AuthGateModalProps> = ({ isOpen, onVerified
     }
     return () => clearInterval(timer);
   }, [uiState, countdown]);
+
+  // 4. Lắng nghe phím Escape để đóng modal khi ở chế độ xem trước
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen && onClose) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -189,8 +201,26 @@ export const AuthGateModal: React.FC<AuthGateModalProps> = ({ isOpen, onVerified
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn"
+      onClick={(e) => {
+        if (e.target === e.currentTarget && onClose) {
+          onClose();
+        }
+      }}
+    >
       <div className="relative w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden">
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            className="absolute top-4 right-4 sm:top-5 sm:right-5 w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-800/80 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 border border-slate-700/60 hover:border-rose-500/40 text-lg font-bold flex items-center justify-center transition-all cursor-pointer z-20"
+            title="Đóng cửa sổ (Xem trước bài khảo sát)"
+            aria-label="Đóng cửa sổ"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
         {/* Top decorative gradient bar */}
         <div className="h-2 bg-gradient-to-r from-amber-500 via-rose-500 to-indigo-500" />
 
