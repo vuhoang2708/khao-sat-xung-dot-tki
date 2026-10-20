@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>DHM TKI Storage Bridge</title>
+</head>
+<body>
+  <script>
+    (function() {
+      function gatherData() {
+        var history = null;
+        var auth = null;
+        try {
+          var rawHistory = localStorage.getItem('tki_assessment_history');
+          if (rawHistory) history = JSON.parse(rawHistory);
+        } catch (e) {}
+
+        try {
+          var rawAuth = localStorage.getItem('dhm_user_auth');
+          if (rawAuth) auth = JSON.parse(rawAuth);
+        } catch (e) {}
+
+        return {
+          source: 'DHM_TKI_BRIDGE',
+          survey_type: 'TKI',
+          tki_assessment_history: history,
+          user_auth: auth,
+          timestamp: Date.now()
+        };
+      }
+
+      function sendToParent() {
+        if (window.parent && window.parent !== window) {
+          var payload = gatherData();
+          window.parent.postMessage(payload, '*');
+        }
+      }
+
+      window.addEventListener('message', function(event) {
+        if (event.data && (event.data === 'GET_DHM_SURVEY_DATA' || event.data.action === 'GET_DHM_SURVEY_DATA')) {
+          sendToParent();
+        }
+      });
+
+      // Gửi tự động khi nạp xong
+      if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        setTimeout(sendToParent, 50);
+      } else {
+        window.addEventListener('DOMContentLoaded', function() {
+          setTimeout(sendToParent, 50);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
